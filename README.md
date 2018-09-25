@@ -1,5 +1,5 @@
 # ST20Emu
-An ST20 Emulator, an arm-based mcu used in some 90's Set Top Box, this is an old project and now i think it's completely useless, but i've decided to put here the code that maybe can be useful to someone who wanna write a simple emulator.
+ST20 Emulator, an arm-based mcu used in some 90's Set Top Box, this is an old project and now i think it's completely useless, but i've decided to put here the code that maybe can be useful to someone who wanna write a simple emulator.
 The code can be useful in writing virtual machines too. Feel free to grab, use and misuse anything you want from this source code. The Project was compiled under Win (Visual Studio Professional 2013) and Linux, and run without efforts.
 In the repo there is also a file called '6300.bin', the firmware of a very very very old STB i bought so many years ago that i don't exactly remember when. This emu came back directly from the dust of my archive, as you can see i wrote the last version in january 2012, after that the project was abandoned due to lack of time to dedicate to it.
 The instructions set manual is present too.
