@@ -1,0 +1,245 @@
+ST20 emulator V3.0
+
+V2.0 15 Marzo 2002
+V3.0 20 Dicembre 2011
+v3.1 31 Dicembre 2011
+v3.2 04 Gennaio 2012
+
+
+Come usarlo
+----------
+
+Per iniziare, digitare 'st20emu' in una finestra DOS oppure 
+doppio click sull'icona. Al prompt '>' digitare:
+
+    l <load_address> <nomefile>
+
+dove <nomefile> è il nome del file contenente le istruzioni ST20
+(ad esempio un dump di un firm per STB), e <load_address> è la
+locazione iniziale da cui iniziare a caricare il firmware (ad
+esempio 7fe00000 per i firm da 2Mbit).Se vi dimenticate di
+caricare un file otterrete un sacco di errori, fino a che
+l'emulatore non avrà istruzioni ST20 da emulare.
+Alcuni settaggi vengono letti dal file 'st20emu.ini' che deve risiedere
+nella stessa directory dell'emulatore. I comandi sono facilmente 
+comprensibili ed il contenuto si spiega da solo, basta andare a leggere.
+
+Adesso potete iniziare a impartire comandi all'emulatore
+
+
+Comandi dell'emulatore
+-----------------
+
+Prima di procedere con i comandi, ecco una lista dei parametri usati dai comandi:
+
+<valore> rappresenta un valore esadecimale a 32bit.
+<indirizzo> rappresenta un indirizzo espresso in esadecimale (32bit).
+<nomefile> rappresenta il nome del firmware da caricare
+<registro> può essere
+    a (registro A)
+    b (registro B)
+    c (registro C)
+    i (Iptr)
+<indice> un numero esadecimale che rappresenta un valido indice WPtr
+
+
+Ecco qui i comandi...
+
+<ENTER>
+	Il tasto ENTER esegue l'istruzione successiva
+
+a <valore>
+	Setta il registro A con il valore specificato
+
+b <valore>
+	Setta il registro B con il valore specificato
+
+c <valore>
+	Setta il registro C con il valore specificato
+
+db <valore>
+	Cerca nel database interno  informazioni circa
+	il registro passato come argomento (in esadecimale).
+
+g
+	Chiede all'emulatore di eseguire l'emulazione dal corrente
+	indirizzo. Il prompt dei comandi è tacitato. Il prompt
+	riapparirà quando la condizione di watch verrà incontrata
+	(vedere il comando 's') o quando saranno state eseguite
+	1.000.000 di istruzioni senza incontrare nessuna condizione
+	di watch. Non si può eseguire l'istruzione 'g' se non
+	è stato settato nessun watch.
+	Durante l'esecuzione si può premere il tasto 'g' per interromperla.
+
+i <valore>
+	Setta il registro Iptr con il valore specificato
+
+l <indirizzo> <nomefile>
+	Carica il file specificato in memoria a partire
+	dalla locazione specificata come indirizzo
+
+load <nome>
+	Carica lo stato dell'ST20 che è stato precedentemente
+	salvato dal comando 'save'
+
+omr
+	mostra lo stato degli 'Other Machine Registers'
+	tra i quali i registri di clock, vari registri di stato, trap,
+	interrupt ed altri.
+
+q
+    	Esce dall'emulatore
+
+s <registro> <valore>
+	Setta una condizione di watch. Quando il registro specificato
+	conterrà il valore specificato, la condizione di watch verrà
+	segnalata .
+
+save <nome>
+	Crea una directory col nome specificato che conterrà un dump
+	dei contenuti della memoria e lo stato della CPU.
+	I contenuti della memoria sono salvati a pezzi di 8kb.
+	I file .bin sono il contenuto della memoria. Questi possono
+	esser caricati in un hex editore o dentro IDA per essere
+	ulteriormente processati.
+	I file .use sono flags che indicano se un particolare byte in
+	memoria è stato definito oppure no.
+	Il file cpu.bin conterrà lo stato della CPU.
+
+v <indirizzo>
+	mostra la word contenuta nell'indirizzo di memoria specificato.
+
+va <indirizzo> <valore>
+	setta la word all'indirizzo specificato col valore specificato.
+
+vaa <indirizzo> <range>
+	mostra un numero di word specificate dal parametro <range>, a
+	partire dall'indirizzo  specificato.
+
+ver
+	mostra il contenuto del registro 'Enables' che fa parte degli OMR
+	(Other Machine Registers), con label che descrivono il significato
+	di ogni bit settato a 1. (TRAP & INTERRUPTS)
+
+vra
+	"V"erbose "R"egister "A"ccess, setta il corrispondente flag
+	per un output dettagliato in caso di esecuzione di istruzioni
+	devss/sb/sw e devls/lb/lw (al momento solo per MCU STi5518).
+
+w <indice> <valore>
+	Setta la word del Workspace all'indice specificato con il valore
+	specificato.
+
+Dopo l'esecuzione di un'istruzione, l'emulatore mostrerà
+- i contenuti dei registri A,B,C e Iptr
+- Tutte le words allocate nel workspace
+- l'indirizzo della prossima istruzione, il suo valore in esadecimale e 
+  il corrispondente mnemonico .
+- come ultima cosa sarà mostrato il prompt ('>') dei comandi.
+
+Ecco un esempio di cosa dovreste vedere:
+------------
+
+A=0x7fff0014 B=0xaaaaaaaa C=0xaaaaaaaa  Iptr=0x7fff0038
+Wptr  0=0x7fff0014  1=0x7ffffff0  2=0xaaaaaaaa 3=0xaaaaaaaa
+      4=0x7ffffff0
+
+7fff0038  60 bd  ajw fffffffd
+>
+
+E questo quello che si dovrebbe vedere con il modo 'vra' acceso (
+se un'entry verrà trovata nel database interno)
+------------
+
+7fff01a4  2f f1  devsb
+>
+NOTE: At 0x7fff01a4 Write to device at address 00000e00, value=0x00000007
+REGN: MPEG_CONTROL_7_0 bits:8 access:R/W
+DESC: MPEG Audio/Video buffer control register
+A=0x7fff01d2 B=0xaaaaaaaa C=0xaaaaaaaa  Iptr=0x7fff01a6
+Wptr  0=0x7fff01d2  1=0xaaaaaaaa  2=0xaaaaaaaa  3=0xaaaaaaaa
+      4=0x7ffffff0  5=0xaaaaaaaa  6=0xaaaaaaaa
+
+7fff01a6  27 40  ldc 70
+>
+------------
+Dove:
+
+NOTE è il solito campo messo da ST20emu
+REGN: sta per (REG)ister (N)ame, il nome del registro (è anche nei #defines)
+bits: è l'estensione del registro in bit
+access: il tipo di accesso consentito per il registro (R)ead (W)rite etc.
+DESC: sta per (DESCR)izione, quando disponibile.
+
+Questo è l'output del comando 'omr'
+------------
+
+> omr
+OTHER MACHINE REGISTERS
+-----------------------
+Enables=0xffffc000
+ClockRegHP=0x20000000 ClockRegLP=0x20000000 ClockEnables=0x03
+HP_ErrFlag=0x00 LP_ErrFlag=0x00 HaltOnError=0x00
+>
+
+------------
+...e questo quello del comando 'ver'
+
+> ver
+Enables Register Value=0xffffc000
+ LP_PROCESS_INT_ENB     is set
+ LP_TIMESLICE_ENB       is set
+ LP_EXTERNALEVENT_ENB   is set
+ LP_TIMER_ALRM_ENB      is set
+ HP_PROCESS_INT_ENB     is set
+ HP_TIMESLICE_ENB       is set
+ HP_EXTERNALEVENT_ENB   is set
+ HP_TIMER_ALRM_ENB      is set
+>
+
+------------
+
+devls/lb/lw and devss/sb/sw possono essere usati anche per accedere alla memoria
+,così se non verrà trovata l'entry nel database interno verrà ritornata una
+descrizione più generale, ricavata dalla mappa di memoria del datasheet.
+Esempio:
+
+NOTE: At 0xc0402804 Write to device at address c042a5e8, value=0x00000002
+DESCR: Address is into Shared SDRAM (Region 1)
+------------
+
+L'istruzione ajw non viene eseguita. Se premete il tasto ENTER sarà eseguita
+e verranno mostrati a video i risultati dell'esecuzione.
+
+
+Note
+-----
+
+Alle locazioni di memoria non usate è stato assegnato il pattern 0xCCCCCCCC
+come nel simulatore ufficiale st20sim.exe
+
+Il Workspace è stato assegnato agli indirizzi di memoria da
+0x1FFFF000 a 0x1FFFFFFF.  La prima word del workspace è salvata a 
+0x1FFFFFFC. Le altre word del workspace sono salvate consecutivamente
+agli indirizzi inferiori (il workspace si espande verso il basso).
+
+L'emulatore implementa solo le istruzioni ST20 più comuni ed avviserà
+con un messaggio quando sarà incontrata un'istruzione non ancora
+implementata.
+
+Adesso il sistema dei clock e dei timer si avvale di un conteggio
+(abbastanza) preciso dei cicli di ogni istruzione eseguita, ovviamente per quelle
+non ancora implementate il clock non si incrementerà affatto. Quindi la variabile
+TIMER_GUESS non serve più, ogni volta che si legge un timer, sia di alta che di 
+bassa priorità, sarà ritornato un valore prossimo a quello reale di una MCU
+STi5518 a 60,75Mhz
+
+Devo ancora aggiungere un sacco di cose a questo emulatore
+- implementare il set di istruzioni completo.
+- permettere alla gente di assegnare label agli indirizzi di memoria
+- aggiungere un comando per saltare le chiamate a subroutine
+
+Accetterò altri suggerimenti, ma non è garantito che finisca il lavoro
+molto velocemente...
+
+[ITA] Translation by MrCODE - Dec.20 2011
